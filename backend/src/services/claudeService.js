@@ -50,6 +50,24 @@ RULES:
 - Every JSON string value must be a single sentence or short phrase — no embedded newlines.
 - Tone: approachable, intellectually curious, educational. Written for a smart adult with no economics background.`
 
+const TRADE_HISTORY_SYSTEM_PROMPT = `You are a commodity market educator for TradeRoots. Generate an educational overview of the history of commodity trading for users with no prior finance background.
+
+Return ONLY a valid JSON object matching the exact schema below. No markdown, no code fences, no preamble.
+
+{
+  "overview": "2-3 sentences introducing commodity trading as a concept and its global importance",
+  "ancient_origins": "2-3 sentences on the earliest forms of commodity trade, from Mesopotamian grain contracts to medieval spice routes",
+  "rise_of_exchanges": "2-3 sentences on the formation of organized commodity exchanges, from the Dojima Rice Exchange in 1730s Japan to the Chicago Board of Trade in 1848",
+  "modern_markets": "2-3 sentences on electronic trading, globalization, and how commodity markets function today",
+  "fun_fact": "One surprising or counterintuitive historical fact about commodity trading"
+}
+
+RULES:
+- Output only the JSON object. Zero other characters.
+- Write in present tense about enduring historical facts.
+- Tone: approachable, intellectually curious. Written for a smart adult with no economics background.
+- Every value is a single string — no embedded newlines.`
+
 async function getAIContent(commodityName, categoryName, unit) {
   const client = new Anthropic()
   const response = await client.messages.create({
@@ -72,4 +90,15 @@ async function getAIContent(commodityName, categoryName, unit) {
   return JSON.parse(response.content[0].text)
 }
 
-module.exports = { getAIContent }
+async function getTradeHistory() {
+  const client = new Anthropic()
+  const response = await client.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1536,
+    system: [{ type: 'text', text: TRADE_HISTORY_SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
+    messages: [{ role: 'user', content: 'Generate the history of commodity trading overview.' }],
+  })
+  return JSON.parse(response.content[0].text)
+}
+
+module.exports = { getAIContent, getTradeHistory }

@@ -157,3 +157,52 @@ describe('claudeService.getAIContent', () => {
     await expect(getAIContent('Gold', 'Precious Metals', 'per troy oz')).rejects.toThrow()
   })
 })
+
+// ─── claudeService.getTradeHistory ───────────────────────────────────────────
+
+const MOCK_TRADE_HISTORY = {
+  overview: 'Commodity trading has shaped civilizations for thousands of years.',
+  ancient_origins: 'The earliest commodity contracts appeared in Mesopotamia around 1750 BCE.',
+  rise_of_exchanges: 'The Dojima Rice Exchange in 1730s Japan was the world\'s first futures market.',
+  modern_markets: 'Today most commodity trading occurs electronically on global exchanges.',
+  fun_fact: 'The word "salary" derives from the Latin for salt, once used as currency.',
+}
+
+describe('claudeService.getTradeHistory', () => {
+  const mockCreate = jest.fn()
+
+  beforeEach(() => {
+    jest.resetModules()
+    mockCreate.mockReset()
+    const Anthropic = require('@anthropic-ai/sdk')
+    Anthropic.mockImplementation(() => ({ messages: { create: mockCreate } }))
+  })
+
+  test('returns parsed trade history on success', async () => {
+    mockCreate.mockResolvedValue({
+      content: [{ type: 'text', text: JSON.stringify(MOCK_TRADE_HISTORY) }],
+    })
+    const { getTradeHistory } = require('../src/services/claudeService')
+    const result = await getTradeHistory()
+    expect(result).toEqual(MOCK_TRADE_HISTORY)
+  })
+
+  test('calls Claude with correct model and max_tokens', async () => {
+    mockCreate.mockResolvedValue({
+      content: [{ type: 'text', text: JSON.stringify(MOCK_TRADE_HISTORY) }],
+    })
+    const { getTradeHistory } = require('../src/services/claudeService')
+    await getTradeHistory()
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ model: 'claude-sonnet-4-6', max_tokens: 1536 })
+    )
+  })
+
+  test('throws on malformed JSON from Claude', async () => {
+    mockCreate.mockResolvedValue({
+      content: [{ type: 'text', text: 'not valid json {{' }],
+    })
+    const { getTradeHistory } = require('../src/services/claudeService')
+    await expect(getTradeHistory()).rejects.toThrow()
+  })
+})

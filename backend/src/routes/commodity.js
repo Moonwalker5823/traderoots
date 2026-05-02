@@ -3,11 +3,12 @@ const express = require('express')
 const router = express.Router()
 const { fetchPrice } = require('../services/priceService')
 const { generateHistory } = require('../services/historyService')
-const { getAIContent } = require('../services/claudeService')
+const { getAIContent, getTradeHistory } = require('../services/claudeService')
 const { findCategory, findCommodity } = require('../data/categories')
 
 // Server-side cache for Claude responses — educational content is stable within a session
 const aiCache = new Map()
+let cachedTradeHistory = null
 
 // GET /api/category/:id/prices
 router.get('/category/:id/prices', async (req, res) => {
@@ -94,6 +95,21 @@ router.get('/commodity/:slug/ai', async (req, res) => {
     res.json({ ai })
   } catch (err) {
     console.error('GET /commodity/:slug/ai error:', err)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// GET /api/history — general history of commodity trading, cached for server session
+router.get('/history', async (req, res) => {
+  try {
+    if (cachedTradeHistory) {
+      return res.json({ history: cachedTradeHistory })
+    }
+    const history = await getTradeHistory()
+    cachedTradeHistory = history
+    res.json({ history })
+  } catch (err) {
+    console.error('GET /api/history error:', err)
     res.status(500).json({ error: 'Internal server error' })
   }
 })
