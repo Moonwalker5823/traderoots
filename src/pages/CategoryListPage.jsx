@@ -150,7 +150,7 @@ export default function CategoryListPage() {
               </div>
             ) : (
               <div ref={contentRef} className="flex flex-col gap-4">
-                <TradeHistoryContent data={historyData} />
+                {historyData && <TradeHistoryContent data={historyData} />}
               </div>
             )}
           </div>
