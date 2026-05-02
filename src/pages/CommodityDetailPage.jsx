@@ -1,4 +1,5 @@
-import { useState } from 'react'
+// eslint-disable-next-line no-unused-vars
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
 import PriceChart from '../components/PriceChart'
@@ -160,6 +161,34 @@ function RelatedSection({ relatedSlugs }) {
             </button>
           )
         })}
+      </div>
+    </div>
+  )
+}
+
+// eslint-disable-next-line no-unused-vars
+function AITeaserCard() {
+  return (
+    <div className="bg-surface border border-divider rounded-xl p-6">
+      <h3 className="text-gold text-xs font-bold uppercase tracking-widest mb-5">
+        About This Commodity
+      </h3>
+      <div className="flex flex-col gap-4">
+        {[
+          { icon: '📖', title: 'What it is & why it matters', sub: 'Origin, global role, and history' },
+          { icon: '🏭', title: 'Who trades it', sub: 'Producers, buyers, investors' },
+          { icon: '💡', title: 'Key & fun facts', sub: 'Market insights and curiosities' },
+        ].map(({ icon, title, sub }) => (
+          <div key={title} className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-gold/10 rounded-lg flex items-center justify-center text-base flex-shrink-0">
+              {icon}
+            </div>
+            <div>
+              <div className="text-white text-sm font-semibold">{title}</div>
+              <div className="text-muted text-xs">{sub}</div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )
