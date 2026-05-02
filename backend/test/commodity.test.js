@@ -206,3 +206,63 @@ describe('claudeService.getTradeHistory', () => {
     await expect(getTradeHistory()).rejects.toThrow()
   })
 })
+
+// ─── claudeService.getCategoryHistory ────────────────────────────────────────
+
+const MOCK_CATEGORY_HISTORY = {
+  overview: 'Precious metals have served as stores of value for thousands of years.',
+  origins: 'Gold and silver were among the first commodities formally traded in ancient markets.',
+  key_milestones: [
+    'The Roman Empire standardized gold coinage around 50 BCE.',
+    'The London Gold Fix was established in 1919 as the first global price benchmark.',
+    'Gold futures began trading on the COMEX in 1974 after the US ended the gold standard.',
+  ],
+  modern_landscape: 'Precious metals trade 24 hours a day on global exchanges and OTC markets.',
+  fun_fact: 'All the gold ever mined could fit inside a single Olympic swimming pool.',
+}
+
+describe('claudeService.getCategoryHistory', () => {
+  const mockCreate = jest.fn()
+
+  beforeEach(() => {
+    jest.resetModules()
+    mockCreate.mockReset()
+    const Anthropic = require('@anthropic-ai/sdk')
+    Anthropic.mockImplementation(() => ({ messages: { create: mockCreate } }))
+  })
+
+  test('returns parsed category history on success', async () => {
+    mockCreate.mockResolvedValue({
+      content: [{ type: 'text', text: JSON.stringify(MOCK_CATEGORY_HISTORY) }],
+    })
+    const { getCategoryHistory } = require('../src/services/claudeService')
+    const result = await getCategoryHistory('Precious Metals', 'Rare metals valued for investment')
+    expect(result).toEqual(MOCK_CATEGORY_HISTORY)
+  })
+
+  test('includes category name in user message sent to Claude', async () => {
+    mockCreate.mockResolvedValue({
+      content: [{ type: 'text', text: JSON.stringify(MOCK_CATEGORY_HISTORY) }],
+    })
+    const { getCategoryHistory } = require('../src/services/claudeService')
+    await getCategoryHistory('Precious Metals', 'Rare metals valued for investment')
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        messages: expect.arrayContaining([
+          expect.objectContaining({
+            role: 'user',
+            content: expect.stringContaining('Precious Metals'),
+          }),
+        ]),
+      })
+    )
+  })
+
+  test('throws on malformed JSON from Claude', async () => {
+    mockCreate.mockResolvedValue({
+      content: [{ type: 'text', text: 'not valid json {{' }],
+    })
+    const { getCategoryHistory } = require('../src/services/claudeService')
+    await expect(getCategoryHistory('Precious Metals', 'desc')).rejects.toThrow()
+  })
+})

@@ -68,6 +68,25 @@ RULES:
 - Tone: approachable, intellectually curious. Written for a smart adult with no economics background.
 - Every value is a single string — no embedded newlines.`
 
+const CATEGORY_HISTORY_SYSTEM_PROMPT = `You are a commodity market educator for TradeRoots. Generate an educational overview of the trading history for a specific commodity category, for users with no prior finance background.
+
+Return ONLY a valid JSON object matching the exact schema below. No markdown, no code fences, no preamble.
+
+{
+  "overview": "2-3 sentences introducing this category's role in global trade",
+  "origins": "2-3 sentences on how this category of commodities came to be formally traded",
+  "key_milestones": ["specific milestone 1", "specific milestone 2", "specific milestone 3"],
+  "modern_landscape": "2-3 sentences on how this category is traded in modern markets",
+  "fun_fact": "One surprising or counterintuitive fact about this category's trading history"
+}
+
+RULES:
+- Output only the JSON object. Zero other characters.
+- key_milestones: exactly 3 items. Each must name a specific year, event, or development — no vague generalities.
+- Write in present tense about enduring historical facts.
+- Tone: approachable, intellectually curious. Written for a smart adult with no economics background.
+- Every string value is a single string — no embedded newlines.`
+
 async function getAIContent(commodityName, categoryName, unit) {
   const client = new Anthropic()
   const response = await client.messages.create({
@@ -101,4 +120,20 @@ async function getTradeHistory() {
   return JSON.parse(response.content[0].text)
 }
 
-module.exports = { getAIContent, getTradeHistory }
+async function getCategoryHistory(categoryName, categoryDescription) {
+  const client = new Anthropic()
+  const response = await client.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1536,
+    system: [{ type: 'text', text: CATEGORY_HISTORY_SYSTEM_PROMPT, cache_control: { type: 'ephemeral' } }],
+    messages: [
+      {
+        role: 'user',
+        content: `Generate trading history for commodity category: ${categoryName}. Description: ${categoryDescription}.`,
+      },
+    ],
+  })
+  return JSON.parse(response.content[0].text)
+}
+
+module.exports = { getAIContent, getTradeHistory, getCategoryHistory }

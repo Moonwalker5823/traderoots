@@ -3,12 +3,13 @@ const express = require('express')
 const router = express.Router()
 const { fetchPrice } = require('../services/priceService')
 const { generateHistory } = require('../services/historyService')
-const { getAIContent, getTradeHistory } = require('../services/claudeService')
+const { getAIContent, getTradeHistory, getCategoryHistory } = require('../services/claudeService')
 const { findCategory, findCommodity } = require('../data/categories')
 
 // Server-side cache for Claude responses — educational content is stable within a session
 const aiCache = new Map()
 let cachedTradeHistory = null
+const categoryHistoryCache = new Map()
 
 // GET /api/category/:id/prices
 router.get('/category/:id/prices', async (req, res) => {
@@ -110,6 +111,25 @@ router.get('/history', async (req, res) => {
     res.json({ history })
   } catch (err) {
     console.error('GET /api/history error:', err)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+// GET /api/category/:id/history — per-category trading history, cached per category id
+router.get('/category/:id/history', async (req, res) => {
+  try {
+    const category = findCategory(req.params.id)
+    if (!category) return res.status(404).json({ error: 'Category not found' })
+
+    if (categoryHistoryCache.has(req.params.id)) {
+      return res.json({ history: categoryHistoryCache.get(req.params.id) })
+    }
+
+    const history = await getCategoryHistory(category.name, category.description)
+    categoryHistoryCache.set(req.params.id, history)
+    res.json({ history })
+  } catch (err) {
+    console.error('GET /api/category/:id/history error:', err)
     res.status(500).json({ error: 'Internal server error' })
   }
 })
