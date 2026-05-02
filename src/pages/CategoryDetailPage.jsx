@@ -73,7 +73,7 @@ function CategoryHistoryTeaser() {
             </div>
             <div>
               <div className="text-white text-base font-semibold">{title}</div>
-              <div className="text-muted text-sm">{sub}</div>
+              <div className="text-white text-sm">{sub}</div>
             </div>
           </div>
         ))}
@@ -91,7 +91,7 @@ function CategoryHistoryContent({ data }) {
       </div>
       <div className="bg-surface border border-divider rounded-xl p-6">
         <h3 className="text-gold text-xs font-bold uppercase tracking-widest mb-4">Origins</h3>
-        <p className="text-muted text-sm leading-relaxed">{data.origins}</p>
+        <p className="text-white text-sm leading-relaxed">{data.origins}</p>
       </div>
       <div className="bg-surface border border-divider rounded-xl p-6">
         <h3 className="text-gold text-xs font-bold uppercase tracking-widest mb-4">Key Milestones</h3>
@@ -107,7 +107,7 @@ function CategoryHistoryContent({ data }) {
         <h3 className="text-gold text-xs font-bold uppercase tracking-widest mb-4">
           {"Today's Landscape"}
         </h3>
-        <p className="text-muted text-sm leading-relaxed mb-4">{data.modern_landscape}</p>
+        <p className="text-white text-sm leading-relaxed mb-4">{data.modern_landscape}</p>
         <div className="border-l-2 border-gold pl-4">
           <p className="text-gold text-xs font-bold uppercase tracking-widest mb-1">Did You Know?</p>
           <p className="text-white text-sm leading-relaxed">{data.fun_fact}</p>
@@ -206,7 +206,7 @@ export default function CategoryDetailPage() {
                     View History of the Trade ↓
                   </button>
                   {historyLoading && (
-                    <p className="text-muted text-xs text-center mt-2">
+                    <p className="text-white text-xs text-center mt-2">
                       Preparing content in the background…
                     </p>
                   )}
@@ -215,7 +215,7 @@ export default function CategoryDetailPage() {
             ) : historyLoading ? (
               <div className="bg-surface border border-divider rounded-xl p-6 flex items-center justify-center gap-3">
                 <span className="animate-spin inline-block w-5 h-5 border-2 border-divider border-t-gold rounded-full" />
-                <span className="text-muted text-sm">Loading content…</span>
+                <span className="text-white text-sm">Loading content…</span>
               </div>
             ) : (
               <div ref={historyContentRef} className="flex flex-col gap-4">
