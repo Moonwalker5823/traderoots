@@ -18,25 +18,21 @@ function PriceHeader({ data }) {
               {data.category?.replace(/-/g, ' ')}
             </span>
           </div>
-          {data.priceUnavailable ? (
-            <div className="text-amber-400 text-sm">Price data temporarily unavailable</div>
-          ) : (
-            <>
-              <div className="text-gold text-4xl font-bold">
-                ${data.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-              </div>
-              <div className="text-muted text-sm mt-1">{data.unit}</div>
-              <div
-                className={`flex items-center gap-2 mt-2 text-base font-bold ${isUp ? 'text-up' : 'text-down'}`}
-              >
-                <span>{isUp ? '▲' : '▼'}</span>
-                <span>
-                  {isUp ? '+' : ''}
-                  {data.change.toFixed(2)}%
-                </span>
-                <span className="text-muted font-normal text-sm">today</span>
-              </div>
-            </>
+          <div className="text-gold text-4xl font-bold">
+            ${data.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          </div>
+          <div className="text-muted text-sm mt-1">{data.unit}</div>
+          {!data.priceUnavailable && data.change !== null && (
+            <div
+              className={`flex items-center gap-2 mt-2 text-base font-bold ${isUp ? 'text-up' : 'text-down'}`}
+            >
+              <span>{isUp ? '▲' : '▼'}</span>
+              <span>
+                {isUp ? '+' : ''}
+                {data.change.toFixed(2)}%
+              </span>
+              <span className="text-muted font-normal text-sm">today</span>
+            </div>
           )}
         </div>
         <div className="text-right">

@@ -28,7 +28,7 @@ router.get('/category/:id/prices', async (req, res) => {
         return {
           name: c.name,
           slug: c.slug,
-          price,
+          price: livePrice,
           unit: c.unit,
           ticker: c.ticker,
           change,
@@ -64,7 +64,7 @@ router.get('/commodity/:slug', async (req, res) => {
       name: commodity.name,
       slug: commodity.slug,
       category: commodity.categoryId,
-      price: priceUnavailable ? null : price,
+      price: livePrice,
       unit: commodity.unit,
       ticker: commodity.ticker,
       change,
