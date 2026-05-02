@@ -5,31 +5,48 @@
 
 ## Problem
 
-The CategoryListPage is fully static — it shows category tiles but offers no educational context about commodity trading as a whole. Users with no background have no entry point into the history and mechanics of global commodity markets before they start browsing.
+The CategoryListPage and CategoryDetailPage are educationally thin — they show categories and prices but give users no historical context about commodity trading. Users with no background have no entry point into how global commodity markets evolved before they start browsing.
 
 ## Solution
 
-Add a "History of the Trade" section below the category grid on the CategoryListPage. A teaser card previews the three content sections. A gold "View History of the Trade" button reveals the full content when clicked. The AI fetch starts immediately on page load so the content is ready (or nearly ready) by the time the user scrolls down and clicks.
+Two additions:
+
+1. **CategoryListPage** — A general "History of the Trade" section below the category grid. One AI fetch covers the entire history of commodity trading.
+2. **CategoryDetailPage** — A per-category "History of [Category] Trading" section below the commodity grid. One AI fetch per category (5 total), each covering that category's specific trading history.
+
+Both use the same deferred reveal pattern: fetch starts on page load, teaser card + gold button shown while it runs, content revealed on click.
 
 ## Architecture
+
+### CategoryListPage
 
 ```
 Page load
   └── GET /api/history → Claude (3–8s cold, instant from server cache)
-        └── loading=true → show TradeHistoryTeaser + CTA button
-              user browses category grid
+        └── loading=true → TradeHistoryTeaser + CTA button
+              user browses category grid (~natural dwell)
               fetch completes → loading=false
-              user clicks button → content revealed + smooth-scroll
+              user clicks → content revealed + smooth-scroll
 ```
 
-**Backend cache:** Server-side `Map` in `commodity.js` (same pattern as commodity AI cache). One Claude call per server session, shared across all users.
+### CategoryDetailPage
 
-**Frontend cache:** Module-level `historyCache` object in `CategoryListPage.jsx` (same session-cache pattern as `useCommodity`). Navigating away and back does not re-fetch.
+```
+Page load
+  └── GET /api/category/:id/history → Claude (3–8s cold, cached per category)
+        └── loading=true → CategoryHistoryTeaser + CTA button
+              user browses commodity grid (~natural dwell)
+              fetch completes → loading=false
+              user clicks → content revealed + smooth-scroll
+```
 
-## Claude Content Schema
+**Backend cache:** Server-side `Map` in `commodity.js`. One Claude call per unique request per server session, shared across all users.
 
-`GET /api/history` returns:
+**Frontend cache:** Module-level cache objects (`historyCache`, `categoryHistoryCache`) in their respective page files. Navigating away and back does not re-fetch within the same session.
 
+## Claude Content Schemas
+
+### `GET /api/history`
 ```json
 {
   "history": {
@@ -42,68 +59,83 @@ Page load
 }
 ```
 
+### `GET /api/category/:id/history`
+```json
+{
+  "history": {
+    "overview": "2–3 sentence intro to this category's trading history",
+    "origins": "paragraph on how this category of commodities came to be traded",
+    "key_milestones": ["milestone 1", "milestone 2", "milestone 3"],
+    "modern_landscape": "how this category is traded today",
+    "fun_fact": "one surprising fact about this category's trading history"
+  }
+}
+```
+
 ## Components
 
-All new code lives in `src/pages/CategoryListPage.jsx` (no new files).
+### CategoryListPage additions (all inline, no new files)
 
-### `useTradeHistory()` hook
+**`useTradeHistory()` hook** — Fetches `GET /api/history` on mount. Module-level `historyCache` for session persistence. Returns `{ data, loading, error }`.
 
-Fetches `GET /api/history` on mount. Uses a module-level `historyCache` object for session persistence. Returns `{ data, loading, error }`.
-
-### `TradeHistoryTeaser`
-
-Static preview card shown before reveal. Three rows:
+**`TradeHistoryTeaser`** — Static preview card, three rows:
 - 🏛️ **Ancient origins** — Mesopotamia to medieval trade routes
 - 📈 **Rise of exchanges** — How futures markets were born
 - 🌐 **Modern global markets** — Electronic trading and today's landscape
 
-Same `bg-surface` / `border-divider` / `text-gold` styling as `AITeaserCard`.
+**`TradeHistoryContent`** — Revealed content: overview card, ancient origins card, rise of exchanges card, modern markets card, fun fact card (gold accent).
 
-### `TradeHistoryContent`
+**Reveal logic** — `revealed` state + `hasScrolled` ref + `contentRef` + `useEffect([revealed, loading])`. Same three-state button pattern as `CommodityDetailPage`.
 
-Revealed content. Four cards:
-1. Overview paragraph
-2. Ancient Origins paragraph
-3. Rise of Exchanges paragraph
-4. Modern Markets paragraph + Fun Fact (gold accent)
+### CategoryDetailPage additions (all inline, no new files)
 
-### CTA Button & Reveal Logic (inside `CategoryListPage`)
+**`useCategoryHistory(id)` hook** — Fetches `GET /api/category/:id/history` on mount, keyed by `id`. Module-level `categoryHistoryCache` for session persistence. Resets on `id` change. Returns `{ data, loading, error }`.
 
-Same three-state pattern as commodity detail:
+**`CategoryHistoryTeaser`** — Static preview card, three rows:
+- 📜 **Origins** — How this market first emerged
+- 🏗️ **Key milestones** — Defining moments in this category's history
+- 🌍 **Today's landscape** — How it's traded in modern markets
 
-| State | Condition | Appearance |
-|---|---|---|
-| Idle | `!revealed && loading` | Gold button + hint "Preparing content in the background…" |
-| Loading | `revealed && loading` | Spinner card "Loading content…" |
-| Ready | `!revealed && !loading` | Gold button, no hint |
+**`CategoryHistoryContent`** — Revealed content: overview card, origins card, key milestones card (bullet list), modern landscape card, fun fact card (gold accent).
 
-On click: set `revealed=true`. `useEffect([revealed, loading])` smooth-scrolls `contentRef` into view once both are true. `hasScrolled` ref prevents re-scroll.
+**Reveal logic** — Same `revealed` / `hasScrolled` / `contentRef` pattern, independent from `CategoryDetailPage`'s existing price-data state.
 
-## Page Layout
+## Page Layouts
 
+### CategoryListPage
 ```
 Header (Logo)
   Page title + subtitle
   Category grid (5 tiles, 2-column, unchanged)
-  TradeHistoryTeaser + CTA button   ← new
-  [TradeHistoryContent on reveal]   ← new
+  TradeHistoryTeaser + CTA button        ← new
+  [TradeHistoryContent on reveal]        ← new
+```
+
+### CategoryDetailPage
+```
+Header (Logo)
+  Back button
+  Category icon + name + description
+  Commodity grid (unchanged)
+  CategoryHistoryTeaser + CTA button     ← new
+  [CategoryHistoryContent on reveal]     ← new
 ```
 
 ## Error Handling
 
-If `GET /api/history` fails, the teaser card and button are hidden and no error is shown — the rest of the page is unaffected. Silent failure is appropriate here since history is supplementary content.
+Both history sections fail silently — if the fetch errors, the teaser card and button are hidden and the rest of the page is unaffected. History is supplementary content; a fetch failure should never degrade the primary experience.
 
 ## Changes Required
 
 | File | Change |
 |---|---|
-| `backend/src/routes/commodity.js` | Add `GET /api/history` route + server-side cache entry |
-| `backend/src/services/claudeService.js` | Add `getTradeHistory()` function with system prompt |
-| `src/pages/CategoryListPage.jsx` | Add `useTradeHistory` hook + `TradeHistoryTeaser` + `TradeHistoryContent` components + reveal logic |
+| `backend/src/routes/commodity.js` | Add `GET /api/history` + `GET /api/category/:id/history` routes with server-side caches |
+| `backend/src/services/claudeService.js` | Add `getTradeHistory()` and `getCategoryHistory(name, description)` functions |
+| `src/pages/CategoryListPage.jsx` | Add `useTradeHistory` hook + `TradeHistoryTeaser` + `TradeHistoryContent` + reveal logic |
+| `src/pages/CategoryDetailPage.jsx` | Add `useCategoryHistory` hook + `CategoryHistoryTeaser` + `CategoryHistoryContent` + reveal logic |
 
 ## Out of Scope
 
-- Per-category history (deferred to a future spec)
 - localStorage persistence across sessions
 - Retry button on error
-- Any changes to CategoryDetailPage, CategoryCard, or other existing components
+- Any changes to CategoryCard, CommodityDetailPage, or other existing components
