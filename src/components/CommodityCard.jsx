@@ -20,13 +20,22 @@ export default function CommodityCard({ commodity }) {
       {hasPrice ? (
         <>
           <div className="text-gold text-2xl font-bold">
-            ${commodity.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            $
+            {commodity.price.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </div>
           <div className="text-muted text-xs mt-0.5 mb-2">{commodity.unit}</div>
           {commodity.change !== null && (
-            <div className={`flex items-center gap-1.5 text-sm font-bold ${isUp ? 'text-up' : 'text-down'}`}>
+            <div
+              className={`flex items-center gap-1.5 text-sm font-bold ${isUp ? 'text-up' : 'text-down'}`}
+            >
               <span>{isUp ? '▲' : '▼'}</span>
-              <span>{isUp ? '+' : ''}{commodity.change.toFixed(2)}%</span>
+              <span>
+                {isUp ? '+' : ''}
+                {commodity.change.toFixed(2)}%
+              </span>
               <span className="text-muted font-normal text-xs">from prev. close</span>
             </div>
           )}

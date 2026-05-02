@@ -19,7 +19,7 @@ const MOCK_AI = {
     'Central banks hold over 35,000 tonnes in reserve.',
   ],
   fun_facts: [
-    "Gold is the only metal that is yellow in its pure form — all other metals are grey or white.",
+    'Gold is the only metal that is yellow in its pure form — all other metals are grey or white.',
     'Ancient Egyptians believed gold was the flesh of the sun god Ra.',
     'The largest gold nugget ever found, the Welcome Stranger (1869), weighed 97 kg.',
   ],

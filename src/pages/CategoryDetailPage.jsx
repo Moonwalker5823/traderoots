@@ -11,7 +11,6 @@ export default function CategoryDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const category = findCategory(id)
-
   const [commodities, setCommodities] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -28,7 +27,7 @@ export default function CategoryDetailPage() {
       .then((data) => setCommodities(data.commodities))
       .catch(() => setError('Unable to load prices. Please try again.'))
       .finally(() => setLoading(false))
-  }, [id])
+  }, [id, category])
 
   if (!category) {
     return (

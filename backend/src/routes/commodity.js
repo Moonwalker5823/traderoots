@@ -20,9 +20,7 @@ router.get('/category/:id/prices', async (req, res) => {
         const prev = history[history.length - 2].price
         const curr = history[history.length - 1].price
         const priceUnavailable = price === null
-        const change = priceUnavailable
-          ? null
-          : Math.round(((curr - prev) / prev) * 10000) / 100
+        const change = priceUnavailable ? null : Math.round(((curr - prev) / prev) * 10000) / 100
 
         return {
           name: c.name,
@@ -64,9 +62,7 @@ router.get('/commodity/:slug', async (req, res) => {
     const prev = history[history.length - 2].price
     const curr = history[history.length - 1].price
     const priceUnavailable = priceResult.status !== 'fulfilled' || priceResult.value === null
-    const change = priceUnavailable
-      ? null
-      : Math.round(((curr - prev) / prev) * 10000) / 100
+    const change = priceUnavailable ? null : Math.round(((curr - prev) / prev) * 10000) / 100
 
     res.json({
       name: commodity.name,

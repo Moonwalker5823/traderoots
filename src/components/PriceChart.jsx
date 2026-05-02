@@ -36,7 +36,10 @@ export default function PriceChart({ history, direction }) {
               color: '#fff',
               fontSize: 12,
             }}
-            formatter={(v) => [`$${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2 })}`, 'Price']}
+            formatter={(v) => [
+              `$${Number(v).toLocaleString(undefined, { minimumFractionDigits: 2 })}`,
+              'Price',
+            ]}
             labelFormatter={(l) => `Date: ${l}`}
           />
           <Line type="monotone" dataKey="price" stroke={color} strokeWidth={2} dot={false} />

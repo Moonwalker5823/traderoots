@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import { useParams, useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
 import PriceChart from '../components/PriceChart'
@@ -26,9 +25,14 @@ function PriceHeader({ data }) {
                 ${data.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </div>
               <div className="text-muted text-sm mt-1">{data.unit}</div>
-              <div className={`flex items-center gap-2 mt-2 text-base font-bold ${isUp ? 'text-up' : 'text-down'}`}>
+              <div
+                className={`flex items-center gap-2 mt-2 text-base font-bold ${isUp ? 'text-up' : 'text-down'}`}
+              >
                 <span>{isUp ? '▲' : '▼'}</span>
-                <span>{isUp ? '+' : ''}{data.change?.toFixed(2)}%</span>
+                <span>
+                  {isUp ? '+' : ''}
+                  {data.change?.toFixed(2)}%
+                </span>
                 <span className="text-muted font-normal text-sm">today</span>
               </div>
             </>
@@ -38,27 +42,18 @@ function PriceHeader({ data }) {
           <div className="text-muted text-xs">Last updated</div>
           <div className="text-white text-sm">
             {new Date(data.updatedAt).toLocaleString('en-US', {
-              month: 'short', day: 'numeric', year: 'numeric',
-              hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+              timeZoneName: 'short',
             })}
           </div>
         </div>
       </div>
     </div>
   )
-}
-
-PriceHeader.propTypes = {
-  data: PropTypes.shape({
-    changeDirection: PropTypes.string,
-    name: PropTypes.string,
-    category: PropTypes.string,
-    priceUnavailable: PropTypes.bool,
-    price: PropTypes.number,
-    unit: PropTypes.string,
-    change: PropTypes.number,
-    updatedAt: PropTypes.string,
-  }).isRequired,
 }
 
 function AISection({ data, onRetry }) {
@@ -84,16 +79,20 @@ function AISection({ data, onRetry }) {
         <h3 className="text-gold text-xs font-bold uppercase tracking-widest mb-4">What Is It</h3>
         <p className="text-white text-sm leading-relaxed mb-3">{ai.what_it_is}</p>
         <p className="text-muted text-sm leading-relaxed mb-3">
-          <span className="text-white font-semibold">Why it matters: </span>{ai.why_it_matters}
+          <span className="text-white font-semibold">Why it matters: </span>
+          {ai.why_it_matters}
         </p>
         <p className="text-muted text-sm leading-relaxed">
-          <span className="text-white font-semibold">History: </span>{ai.brief_history}
+          <span className="text-white font-semibold">History: </span>
+          {ai.brief_history}
         </p>
       </div>
 
       {/* Who Trades It */}
       <div className="bg-surface border border-divider rounded-xl p-6">
-        <h3 className="text-gold text-xs font-bold uppercase tracking-widest mb-4">Who Trades It</h3>
+        <h3 className="text-gold text-xs font-bold uppercase tracking-widest mb-4">
+          Who Trades It
+        </h3>
         <div className="flex flex-col gap-3">
           {ai.who_trades_it?.map((participant) => (
             <div key={participant.type} className="bg-navy rounded-lg p-4">
@@ -133,32 +132,15 @@ function AISection({ data, onRetry }) {
   )
 }
 
-AISection.propTypes = {
-  data: PropTypes.shape({
-    ai: PropTypes.shape({
-      what_it_is: PropTypes.string,
-      why_it_matters: PropTypes.string,
-      brief_history: PropTypes.string,
-      who_trades_it: PropTypes.arrayOf(
-        PropTypes.shape({
-          type: PropTypes.string,
-          description: PropTypes.string,
-        })
-      ),
-      key_facts: PropTypes.arrayOf(PropTypes.string),
-      fun_facts: PropTypes.arrayOf(PropTypes.string),
-    }),
-  }).isRequired,
-  onRetry: PropTypes.func.isRequired,
-}
-
 function RelatedSection({ relatedSlugs }) {
   const navigate = useNavigate()
   if (!relatedSlugs?.length) return null
 
   return (
     <div className="bg-surface border border-divider rounded-xl p-6">
-      <h3 className="text-gold text-xs font-bold uppercase tracking-widest mb-4">Explore Related</h3>
+      <h3 className="text-gold text-xs font-bold uppercase tracking-widest mb-4">
+        Explore Related
+      </h3>
       <div className="flex flex-wrap gap-3">
         {relatedSlugs.map((slug) => {
           const commodity = findCommodity(slug)
@@ -177,10 +159,6 @@ function RelatedSection({ relatedSlugs }) {
       </div>
     </div>
   )
-}
-
-RelatedSection.propTypes = {
-  relatedSlugs: PropTypes.arrayOf(PropTypes.string),
 }
 
 export default function CommodityDetailPage() {
@@ -214,7 +192,10 @@ export default function CommodityDetailPage() {
         {error && (
           <div className="bg-surface border border-divider rounded-xl p-4 mb-4 text-amber-400 text-sm flex justify-between items-center">
             <span>{error}</span>
-            <button onClick={retry} className="text-gold text-sm border border-gold/40 rounded px-3 py-1 hover:bg-gold/10 transition-colors ml-4">
+            <button
+              onClick={retry}
+              className="text-gold text-sm border border-gold/40 rounded px-3 py-1 hover:bg-gold/10 transition-colors ml-4"
+            >
               Retry
             </button>
           </div>
