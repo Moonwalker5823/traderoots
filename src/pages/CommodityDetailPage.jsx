@@ -165,6 +165,12 @@ function RelatedSection({ relatedSlugs }) {
   )
 }
 
+const TEASER_SECTIONS = [
+  { icon: '📖', title: 'What it is & why it matters', sub: 'Origin, global role, and history' },
+  { icon: '🏭', title: 'Who trades it', sub: 'Producers, buyers, investors' },
+  { icon: '💡', title: 'Key & fun facts', sub: 'Market insights and curiosities' },
+]
+
 function AITeaserCard() {
   return (
     <div className="bg-surface border border-divider rounded-xl p-6">
@@ -172,11 +178,7 @@ function AITeaserCard() {
         About This Commodity
       </h3>
       <div className="flex flex-col gap-4">
-        {[
-          { icon: '📖', title: 'What it is & why it matters', sub: 'Origin, global role, and history' },
-          { icon: '🏭', title: 'Who trades it', sub: 'Producers, buyers, investors' },
-          { icon: '💡', title: 'Key & fun facts', sub: 'Market insights and curiosities' },
-        ].map(({ icon, title, sub }) => (
+        {TEASER_SECTIONS.map(({ icon, title, sub }) => (
           <div key={title} className="flex items-center gap-3">
             <div className="w-9 h-9 bg-gold/10 rounded-lg flex items-center justify-center text-base flex-shrink-0">
               {icon}
@@ -200,9 +202,16 @@ export default function CommodityDetailPage() {
   const commodity = findCommodity(slug)
   const [revealed, setRevealed] = useState(false)
   const contentRef = useRef(null)
+  const hasScrolled = useRef(false)
 
   useEffect(() => {
-    if (revealed && !aiLoading && contentRef.current) {
+    setRevealed(false)
+    hasScrolled.current = false
+  }, [slug])
+
+  useEffect(() => {
+    if (revealed && !aiLoading && contentRef.current && !hasScrolled.current) {
+      hasScrolled.current = true
       contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }, [revealed, aiLoading])
@@ -256,6 +265,7 @@ export default function CommodityDetailPage() {
                 <div>
                   <button
                     onClick={() => setRevealed(true)}
+                    aria-label="View educational content"
                     className="w-full bg-gold text-navy font-bold text-sm tracking-wide py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-gold-dark transition-colors"
                   >
                     View Educational Content ↓
