@@ -55,6 +55,11 @@ describe('historyService.generateHistory', () => {
     expect(history[history.length - 1].price).toBe(1900)
   })
 
+  test('last price equals the current price input for a float price', () => {
+    const history = generateHistory('gold', 1923.45)
+    expect(history[history.length - 1].price).toBe(1923.45)
+  })
+
   test('dates are sorted ascending with no duplicates', () => {
     const history = generateHistory('gold', 1900)
     for (let i = 1; i < history.length; i++) {
