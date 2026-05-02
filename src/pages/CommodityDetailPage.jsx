@@ -198,6 +198,14 @@ export default function CommodityDetailPage() {
   const { data, loading, aiLoading, error, retry } = useCommodity(slug)
 
   const commodity = findCommodity(slug)
+  const [revealed, setRevealed] = useState(false)
+  const contentRef = useRef(null)
+
+  useEffect(() => {
+    if (revealed && !aiLoading && contentRef.current) {
+      contentRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [revealed, aiLoading])
 
   if (!commodity) {
     return (
@@ -242,18 +250,33 @@ export default function CommodityDetailPage() {
           <div className="flex flex-col gap-4">
             <PriceHeader data={data} />
             <PriceChart history={data.history} direction={data.changeDirection} />
-            {aiLoading ? (
+            {!revealed ? (
               <>
-                <p className="text-muted text-sm text-center py-2">Loading educational content…</p>
-                <SkeletonCard className="h-48" />
-                <SkeletonCard className="h-48" />
-                <SkeletonCard className="h-32" />
+                <AITeaserCard />
+                <div>
+                  <button
+                    onClick={() => setRevealed(true)}
+                    className="w-full bg-gold text-navy font-bold text-sm tracking-wide py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-gold-dark transition-colors"
+                  >
+                    View Educational Content ↓
+                  </button>
+                  {aiLoading && (
+                    <p className="text-muted text-xs text-center mt-2">
+                      Preparing content in the background…
+                    </p>
+                  )}
+                </div>
               </>
+            ) : aiLoading ? (
+              <div className="bg-surface border border-divider rounded-xl p-6 flex items-center justify-center gap-3">
+                <span className="animate-spin inline-block w-5 h-5 border-2 border-divider border-t-gold rounded-full" />
+                <span className="text-muted text-sm">Loading content…</span>
+              </div>
             ) : (
-              <>
+              <div ref={contentRef} className="flex flex-col gap-4">
                 <AISection data={data} onRetry={retry} />
                 <RelatedSection relatedSlugs={data.ai?.related_commodities} />
-              </>
+              </div>
             )}
           </div>
         ) : null}
