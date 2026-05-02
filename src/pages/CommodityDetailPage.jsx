@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
 import PriceChart from '../components/PriceChart'
@@ -56,6 +57,22 @@ function PriceHeader({ data }) {
   )
 }
 
+function CollapsibleSection({ title, titleColor = 'text-gold', children }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="bg-surface border border-divider rounded-xl overflow-hidden">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-6 py-4 hover:bg-white/5 transition-colors"
+      >
+        <span className={`${titleColor} text-xs font-bold uppercase tracking-widest`}>{title}</span>
+        <span className="text-muted text-sm">{open ? '▲' : '▼'}</span>
+      </button>
+      {open && <div className="px-6 pb-6">{children}</div>}
+    </div>
+  )
+}
+
 function AISection({ data, onRetry }) {
   if (!data.ai) {
     return (
@@ -74,7 +91,6 @@ function AISection({ data, onRetry }) {
   const { ai } = data
   return (
     <>
-      {/* What Is It */}
       <div className="bg-surface border border-divider rounded-xl p-6">
         <h3 className="text-gold text-xs font-bold uppercase tracking-widest mb-4">What Is It</h3>
         <p className="text-white text-sm leading-relaxed mb-3">{ai.what_it_is}</p>
@@ -88,11 +104,7 @@ function AISection({ data, onRetry }) {
         </p>
       </div>
 
-      {/* Who Trades It */}
-      <div className="bg-surface border border-divider rounded-xl p-6">
-        <h3 className="text-gold text-xs font-bold uppercase tracking-widest mb-4">
-          Who Trades It
-        </h3>
+      <CollapsibleSection title="Who Trades It">
         <div className="flex flex-col gap-3">
           {ai.who_trades_it?.map((participant) => (
             <div key={participant.type} className="bg-navy rounded-lg p-4">
@@ -101,11 +113,9 @@ function AISection({ data, onRetry }) {
             </div>
           ))}
         </div>
-      </div>
+      </CollapsibleSection>
 
-      {/* Key Facts */}
-      <div className="bg-surface border border-divider rounded-xl p-6">
-        <h3 className="text-gold text-xs font-bold uppercase tracking-widest mb-4">Key Facts</h3>
+      <CollapsibleSection title="Key Facts">
         <div className="flex flex-col gap-3">
           {ai.key_facts?.map((fact, i) => (
             <div key={i} className="border-l-2 border-gold pl-4 py-1">
@@ -113,12 +123,10 @@ function AISection({ data, onRetry }) {
             </div>
           ))}
         </div>
-      </div>
+      </CollapsibleSection>
 
-      {/* Fun Facts */}
       {ai.fun_facts?.length > 0 && (
-        <div className="bg-surface border border-divider rounded-xl p-6">
-          <h3 className="text-up text-xs font-bold uppercase tracking-widest mb-4">Fun Facts</h3>
+        <CollapsibleSection title="Fun Facts" titleColor="text-up">
           <div className="flex flex-col gap-3">
             {ai.fun_facts.map((fact, i) => (
               <div key={i} className="border-l-2 border-up pl-4 py-1">
@@ -126,7 +134,7 @@ function AISection({ data, onRetry }) {
               </div>
             ))}
           </div>
-        </div>
+        </CollapsibleSection>
       )}
     </>
   )
@@ -164,7 +172,7 @@ function RelatedSection({ relatedSlugs }) {
 export default function CommodityDetailPage() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const { data, loading, error, retry } = useCommodity(slug)
+  const { data, loading, aiLoading, error, retry } = useCommodity(slug)
 
   const commodity = findCommodity(slug)
 
@@ -211,8 +219,18 @@ export default function CommodityDetailPage() {
           <div className="flex flex-col gap-4">
             <PriceHeader data={data} />
             <PriceChart history={data.history} direction={data.changeDirection} />
-            <AISection data={data} onRetry={retry} />
-            <RelatedSection relatedSlugs={data.ai?.related_commodities} />
+            {aiLoading ? (
+              <>
+                <SkeletonCard className="h-48" />
+                <SkeletonCard className="h-48" />
+                <SkeletonCard className="h-32" />
+              </>
+            ) : (
+              <>
+                <AISection data={data} onRetry={retry} />
+                <RelatedSection relatedSlugs={data.ai?.related_commodities} />
+              </>
+            )}
           </div>
         ) : null}
       </main>
