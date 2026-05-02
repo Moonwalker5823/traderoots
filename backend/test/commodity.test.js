@@ -1,5 +1,26 @@
 'use strict'
 
+// Mock must be declared before any require of claudeService
+jest.mock('@anthropic-ai/sdk')
+
+const MOCK_AI = {
+  what_it_is: 'Gold is a dense, lustrous yellow metal mined from ore deposits on every continent.',
+  why_it_matters: 'Gold underpins confidence in financial systems worldwide.',
+  brief_history: 'Gold has been exchanged as currency for over 6,000 years.',
+  who_trades_it: [
+    { type: 'Producers', description: 'Mining companies like Barrick and Newmont.' },
+    { type: 'Commercial Buyers', description: 'Jewelers and electronics manufacturers.' },
+    { type: 'Investors & Institutions', description: 'Central banks and ETFs like GLD.' },
+    { type: 'Individual Investors', description: 'Retail buyers seeking inflation protection.' },
+  ],
+  key_facts: [
+    'All the gold ever mined fits in a 21-meter cube.',
+    'Gold is chemically inert — it never corrodes.',
+    'Central banks hold over 35,000 tonnes in reserve.',
+  ],
+  related_commodities: ['silver', 'platinum', 'copper'],
+}
+
 // ─── priceService ────────────────────────────────────────────────────────────
 
 describe('priceService.fetchPrice', () => {
@@ -85,5 +106,49 @@ describe('historyService.generateHistory', () => {
     const gold = generateHistory('gold', 1900)
     const silver = generateHistory('silver', 1900)
     expect(gold.map((p) => p.price)).not.toEqual(silver.map((p) => p.price))
+  })
+})
+
+// ─── claudeService ───────────────────────────────────────────────────────────
+
+describe('claudeService.getAIContent', () => {
+  const mockCreate = jest.fn()
+
+  beforeEach(() => {
+    jest.resetModules()
+    mockCreate.mockReset()
+    const Anthropic = require('@anthropic-ai/sdk')
+    Anthropic.mockImplementation(() => ({ messages: { create: mockCreate } }))
+  })
+
+  test('returns parsed AI content on success', async () => {
+    mockCreate.mockResolvedValue({
+      content: [{ type: 'text', text: JSON.stringify(MOCK_AI) }],
+    })
+    const { getAIContent } = require('../src/services/claudeService')
+    const result = await getAIContent('Gold', 'Precious Metals', 'per troy oz')
+    expect(result).toEqual(MOCK_AI)
+  })
+
+  test('calls Claude with correct model and commodity details', async () => {
+    mockCreate.mockResolvedValue({
+      content: [{ type: 'text', text: JSON.stringify(MOCK_AI) }],
+    })
+    const { getAIContent } = require('../src/services/claudeService')
+    await getAIContent('Gold', 'Precious Metals', 'per troy oz')
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1024,
+      })
+    )
+  })
+
+  test('throws on malformed JSON from Claude', async () => {
+    mockCreate.mockResolvedValue({
+      content: [{ type: 'text', text: 'not valid json {{' }],
+    })
+    const { getAIContent } = require('../src/services/claudeService')
+    await expect(getAIContent('Gold', 'Precious Metals', 'per troy oz')).rejects.toThrow()
   })
 })
