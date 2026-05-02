@@ -31,7 +31,7 @@ function PriceHeader({ data }) {
                 <span>{isUp ? '▲' : '▼'}</span>
                 <span>
                   {isUp ? '+' : ''}
-                  {data.change?.toFixed(2)}%
+                  {data.change.toFixed(2)}%
                 </span>
                 <span className="text-muted font-normal text-sm">today</span>
               </div>
@@ -184,7 +184,7 @@ export default function CommodityDetailPage() {
       <main className="max-w-4xl mx-auto px-6 py-8">
         <button
           onClick={() => navigate(`/category/${commodity.categoryId}`)}
-          className="text-muted text-sm mb-6 hover:text-white transition-colors flex items-center gap-1"
+          className="text-lg mb-6 hover:text-white transition-colors flex items-center gap-1"
         >
           ← Back to {commodity.categoryName?.replace(/-/g, ' ')}
         </button>

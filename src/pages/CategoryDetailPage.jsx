@@ -45,7 +45,7 @@ export default function CategoryDetailPage() {
       <main className="max-w-6xl mx-auto px-6 py-8">
         <button
           onClick={() => navigate('/')}
-          className="text-muted text-sm mb-6 hover:text-white transition-colors flex items-center gap-1"
+          className="text-lg mb-6 hover:text-white transition-colors flex items-center gap-1"
         >
           ← Back to Categories
         </button>
@@ -62,7 +62,7 @@ export default function CategoryDetailPage() {
           </div>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {loading
+          {loading || error
             ? category.commodities.map((_, i) => <SkeletonCard key={i} />)
             : commodities.map((c) => <CommodityCard key={c.slug} commodity={c} />)}
         </div>
