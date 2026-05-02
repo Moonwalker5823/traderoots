@@ -1,4 +1,3 @@
-// eslint-disable-next-line no-unused-vars
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
@@ -166,7 +165,6 @@ function RelatedSection({ relatedSlugs }) {
   )
 }
 
-// eslint-disable-next-line no-unused-vars
 function AITeaserCard() {
   return (
     <div className="bg-surface border border-divider rounded-xl p-6">
