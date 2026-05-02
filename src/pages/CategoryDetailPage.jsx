@@ -23,6 +23,7 @@ function useCategoryHistory(id) {
       return
     }
 
+    let cancelled = false
     setLoading(true)
     setError(null)
     setData(null)
@@ -33,14 +34,20 @@ function useCategoryHistory(id) {
         return res.json()
       })
       .then((json) => {
+        if (cancelled) return
         categoryHistoryCache[id] = json.history
         setData(json.history)
         setLoading(false)
       })
       .catch(() => {
+        if (cancelled) return
         setError('unavailable')
         setLoading(false)
       })
+
+    return () => {
+      cancelled = true
+    }
   }, [id])
 
   return { data, loading, error }
