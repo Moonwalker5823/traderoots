@@ -9,5 +9,7 @@ dist
 .env
 backend/.env
 
-# brainstorm session files
+# local tool files
 .superpowers
+.claude
+docs/superpowers

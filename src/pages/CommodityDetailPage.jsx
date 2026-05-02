@@ -221,6 +221,7 @@ export default function CommodityDetailPage() {
             <PriceChart history={data.history} direction={data.changeDirection} />
             {aiLoading ? (
               <>
+                <p className="text-muted text-sm text-center py-2">Loading educational content…</p>
                 <SkeletonCard className="h-48" />
                 <SkeletonCard className="h-48" />
                 <SkeletonCard className="h-32" />
