@@ -17,20 +17,26 @@ function useTradeHistory() {
       setLoading(false)
       return
     }
+    let cancelled = false
     fetch(`${API_BASE}/api/history`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`)
         return res.json()
       })
       .then((json) => {
+        if (cancelled) return
         historyCache.data = json.history
         setData(json.history)
         setLoading(false)
       })
       .catch(() => {
+        if (cancelled) return
         setError('unavailable')
         setLoading(false)
       })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   return { data, loading, error }
