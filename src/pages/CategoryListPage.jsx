@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import Logo from '../components/Logo'
+import Footer from '../components/Footer'
 import CategoryCard from '../components/CategoryCard'
 import { categories } from '../data/categories'
 
@@ -162,6 +163,7 @@ export default function CategoryListPage() {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   )
 }

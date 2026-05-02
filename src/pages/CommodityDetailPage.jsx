@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
+import Footer from '../components/Footer'
 import PriceChart from '../components/PriceChart'
 import SkeletonCard from '../components/SkeletonCard'
 import { useCommodity } from '../hooks/useCommodity'
@@ -291,6 +292,7 @@ export default function CommodityDetailPage() {
           </div>
         ) : null}
       </main>
+      <Footer />
     </div>
   )
 }

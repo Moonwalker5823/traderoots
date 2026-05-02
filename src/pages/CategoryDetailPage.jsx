@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import Logo from '../components/Logo'
+import Footer from '../components/Footer'
 import CommodityCard from '../components/CommodityCard'
 import SkeletonCard from '../components/SkeletonCard'
 import { findCategory } from '../data/categories'
@@ -225,6 +226,7 @@ export default function CategoryDetailPage() {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   )
 }
