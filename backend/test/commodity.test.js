@@ -18,6 +18,11 @@ const MOCK_AI = {
     'Gold is chemically inert — it never corrodes.',
     'Central banks hold over 35,000 tonnes in reserve.',
   ],
+  fun_facts: [
+    "Gold is the only metal that is yellow in its pure form — all other metals are grey or white.",
+    'Ancient Egyptians believed gold was the flesh of the sun god Ra.',
+    'The largest gold nugget ever found, the Welcome Stranger (1869), weighed 97 kg.',
+  ],
   related_commodities: ['silver', 'platinum', 'copper'],
 }
 
@@ -139,7 +144,7 @@ describe('claudeService.getAIContent', () => {
     expect(mockCreate).toHaveBeenCalledWith(
       expect.objectContaining({
         model: 'claude-sonnet-4-6',
-        max_tokens: 1024,
+        max_tokens: 1536,
       })
     )
   })
