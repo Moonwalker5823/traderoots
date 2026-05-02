@@ -174,18 +174,18 @@ const TEASER_SECTIONS = [
 function AITeaserCard() {
   return (
     <div className="bg-surface border border-divider rounded-xl p-6">
-      <h3 className="text-gold text-xs font-bold uppercase tracking-widest mb-5">
+      <h3 className="text-gold text-sm font-bold uppercase tracking-widest mb-5">
         About This Commodity
       </h3>
       <div className="flex flex-col gap-4">
         {TEASER_SECTIONS.map(({ icon, title, sub }) => (
           <div key={title} className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gold/10 rounded-lg flex items-center justify-center text-base flex-shrink-0">
+            <div className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center text-lg flex-shrink-0">
               {icon}
             </div>
             <div>
-              <div className="text-white text-sm font-semibold">{title}</div>
-              <div className="text-muted text-xs">{sub}</div>
+              <div className="text-white text-base font-semibold">{title}</div>
+              <div className="text-muted text-sm">{sub}</div>
             </div>
           </div>
         ))}
