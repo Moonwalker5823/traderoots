@@ -5,6 +5,7 @@ const categories = [
   {
     id: 'precious-metals',
     name: 'Precious Metals',
+    description: 'Rare metals valued for investment and as stores of wealth',
     commodities: [
       {
         slug: 'gold',
@@ -47,6 +48,7 @@ const categories = [
   {
     id: 'energy',
     name: 'Energy',
+    description: 'Fuels that power the global economy',
     commodities: [
       {
         slug: 'crude-oil',
@@ -89,6 +91,7 @@ const categories = [
   {
     id: 'agriculture',
     name: 'Agriculture',
+    description: 'Crops traded on exchanges worldwide',
     commodities: [
       {
         slug: 'wheat',
@@ -149,6 +152,7 @@ const categories = [
   {
     id: 'industrial-metals',
     name: 'Industrial Metals',
+    description: 'Base metals used in manufacturing and construction',
     commodities: [
       {
         slug: 'copper',
@@ -191,6 +195,7 @@ const categories = [
   {
     id: 'livestock',
     name: 'Livestock',
+    description: 'Animal products traded as futures contracts',
     commodities: [
       {
         slug: 'live-cattle',
